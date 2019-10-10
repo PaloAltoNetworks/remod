@@ -1,6 +1,6 @@
 module go.aporeto.io/remod
 
-go 1.13
+go 1.12
 
 require (
 	github.com/spf13/cobra v0.0.5
