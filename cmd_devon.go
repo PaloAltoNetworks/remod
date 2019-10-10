@@ -13,7 +13,7 @@ func init() {
 	cmdDevon.Flags().StringSliceP("include", "m", nil, "Set the prefix of the modules to include")
 	cmdDevon.Flags().StringSliceP("exclude", "E", nil, "Set the prefix of the modules to exclude")
 	cmdDevon.Flags().StringP("local", "l", "../", "Where the replacements are")
-	cmdDevon.Flags().String("version", "", "Set the version to use for replacement. If empty, it is considered local")
+	cmdDevon.Flags().String("replace-version", "", "Set the version to use for replacement. If empty, it is considered local")
 }
 
 var cmdDevon = &cobra.Command{
@@ -28,7 +28,7 @@ var cmdDevon = &cobra.Command{
 		included := viper.GetStringSlice("include")
 		excluded := viper.GetStringSlice("exclude")
 		local := viper.GetString("local")
-		version := viper.GetString("version")
+		version := viper.GetString("replace-version")
 
 		if err := remod.GitConfig(); err != nil {
 			return fmt.Errorf("unable to install git config: %s", err)

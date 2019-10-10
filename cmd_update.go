@@ -27,16 +27,21 @@ var cmdUpdate = &cobra.Command{
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		folder := viper.GetString("folder")
+		folder := "."
+		if len(args) > 0 {
+			folder = args[0]
+		}
+
 		recursive := viper.GetBool("recursive")
 		included := viper.GetStringSlice("include")
 		excluded := viper.GetStringSlice("exclude")
 		version := viper.GetString("version")
 
 		var paths []string
-		if recursive {
+		if recursive && folder != "." {
 
 			items, err := ioutil.ReadDir(folder)
 			if err != nil {
@@ -70,7 +75,9 @@ var cmdUpdate = &cobra.Command{
 				return fmt.Errorf("unable to move to %s: %s", basedir, err)
 			}
 
-			fmt.Println("* Entering", basedir)
+			if len(paths) > 1 {
+				fmt.Println("* Entering", basedir)
+			}
 
 			idata, err := ioutil.ReadFile(p)
 			if err != nil {

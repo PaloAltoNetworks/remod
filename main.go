@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,7 +18,9 @@ func main() {
 	})
 
 	var rootCmd = &cobra.Command{
-		Use: "remod",
+		Use:           "remod",
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 
 	rootCmd.AddCommand(
@@ -29,6 +33,7 @@ func main() {
 	)
 
 	if err := rootCmd.Execute(); err != nil {
-		panic(err)
+		fmt.Printf("error: %s\n", err)
+		os.Exit(1)
 	}
 }
