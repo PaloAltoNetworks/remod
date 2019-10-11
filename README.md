@@ -34,7 +34,7 @@ or using remote one.
 
 For instance, if we have the following `go.mod`:
 
-```gomod
+```mod
 module go.aporeto.io/remod
 
 go 1.12
@@ -53,7 +53,7 @@ remod on -m github.com/spf13/viper
 
 The `go.mod` file will now look like:
 
-```gomod
+```mod
 module go.aporeto.io/remod
 
 go 1.12
@@ -118,7 +118,7 @@ remod on -m github.com/spf13/viper --prefix github.com/me/ --replace-version dev
 
 Which will turn the `go.mod` file to:
 
-```go.mod
+```mod
 module go.aporeto.io/remod
 
 go 1.12
