@@ -14,7 +14,7 @@ func Enable(data []byte, modules []string, base string, version string) ([]byte,
 		return data, nil
 	}
 
-	if bytes.Contains(data, []byte("replace ( // remod:replacements")) {
+	if bytes.Contains(data, []byte("// remod:replacements:start")) {
 		return data, nil
 	}
 
@@ -24,11 +24,13 @@ func Enable(data []byte, modules []string, base string, version string) ([]byte,
 
 	buf := bytes.NewBuffer(data)
 
-	_, _ = buf.WriteString("\nreplace ( // remod:replacements\n")
+	_, _ = buf.WriteString("\n// remod:replacements:start\n\n")
+	_, _ = buf.WriteString("replace (\n")
 	for _, m := range modules {
 		_, _ = buf.WriteString(fmt.Sprintf("\t%s => %s%s%s\n", m, base, filepath.Base(m), version))
 	}
-	_, _ = buf.WriteString(")")
+	_, _ = buf.WriteString(")\n")
+	_, _ = buf.WriteString("\n// remod:replacements:end")
 
 	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
 }
@@ -40,8 +42,8 @@ func Disable(data []byte) ([]byte, error) {
 
 	buf := bytes.NewBuffer(nil)
 
-	start := []byte("replace ( // remod:replacements")
-	end := []byte(")")
+	start := []byte("// remod:replacements:start")
+	end := []byte("remod:replacements:end")
 
 	var strip bool
 	var last []byte

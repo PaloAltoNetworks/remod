@@ -50,11 +50,15 @@ require cloud.google.com/go/storage v1.1.0 // indirect
 				append(
 					gomod,
 					[]byte(`
-replace ( // remod:replacements
+// remod:replacements:start
+
+replace (
     go.aporeto.io/gaia => ../gaia
     go.aporeto.io/manipulate => ../manipulate
     go.aporeto.io/midgard-lib => ../midgard-lib
 )
+
+// remod:replacements:end
 `,
 					)...,
 				),
@@ -69,11 +73,15 @@ replace ( // remod:replacements
 			append(
 				gomod,
 				[]byte(`
-replace ( // remod:replacements
+// remod:replacements:start
+
+replace (
     go.aporeto.io/gaia => ../gaia
     go.aporeto.io/manipulate => ../manipulate
     go.aporeto.io/midgard-lib => ../midgard-lib
 )
+
+// remod:replacements:end
 `,
 				)...,
 			),
@@ -95,11 +103,15 @@ replace ( // remod:replacements
 			append(
 				gomod,
 				[]byte(`
-replace ( // remod:replacements
+// remod:replacements:start
+
+replace (
 	go.aporeto.io/gaia => ../gaia
 	go.aporeto.io/manipulate => ../manipulate
 	go.aporeto.io/midgard-lib => ../midgard-lib
 )
+
+// remod:replacements:end
 `,
 				)...,
 			),
@@ -121,11 +133,15 @@ replace ( // remod:replacements
 			append(
 				gomod,
 				[]byte(`
-replace ( // remod:replacements
+// remod:replacements:start
+
+replace (
 	go.aporeto.io/gaia => github.com/la/gaia v12.0.1
 	go.aporeto.io/manipulate => github.com/la/manipulate v12.0.1
 	go.aporeto.io/midgard-lib => github.com/la/midgard-lib v12.0.1
 )
+
+// remod:replacements:end
 `,
 				)...,
 			),
@@ -161,11 +177,15 @@ require (
 
 require cloud.google.com/go/storage v1.1.0 // indirect
 
-replace ( // remod:replacements
+// remod:replacements:start
+
+replace (
 	go.aporeto.io/gaia => github.com/la/gaia
 	go.aporeto.io/manipulate => github.com/la/manipulate
 	go.aporeto.io/midgard-lib => github.com/la/midgard-lib
 )
+
+// remod:replacements:end
 `)
 
 	type args struct {
