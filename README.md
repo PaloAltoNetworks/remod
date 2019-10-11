@@ -5,10 +5,10 @@ It provides a cli to manage replacement directives and uses git attributes
 to make the changes invisible from git's point of view.
 
 When you work on projects with various internal libraries that are working
-closely together, you usually need to have a bit of velocity. For example, the Aporeto ci pipelines 
+closely together, you usually need to have a bit of velocity. For example, the Aporeto ci pipelines
 are able combine multiple pull requests accross multiple github repositories to test them together.
 
-While go modules help in a lot of scenarios, being able to do such things is not one them. remod 
+While go modules help in a lot of scenarios, being able to do such things is not one them. remod
 made that workflow easier by selectively restoring the GOPATH behavior on only a subset
 of the dependencies, while benefiting from go modules for the others.
 
@@ -19,8 +19,6 @@ To install remod, run:
 ```shell
 go get go.aporeto.io/remod
 ```
-
->  use `go get github.com/aporeto-inc/remod` until vanity url is available
 
 ## Init
 
