@@ -42,7 +42,7 @@ You can write manual replacements, as long as they are between the special comme
 ```mod
 // remod:replacements:start
 
-// manual replacements here.
+<manual replacements here>
 
 // remod:replacements:end
 ```
