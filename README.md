@@ -4,6 +4,14 @@ Remod is a tool to work with local copies of libraries and go modules.
 It provides a cli to manage replacement directives and uses git attributes
 to make the changes invisible from git's point of view.
 
+When you work on projects with various internal libraries that are working
+closely together, you usually need to have a bit of velocity. For example, the Aporeto ci pipelines 
+are able combine multiple pull requests accross multiple github repositories to test them together.
+
+While go modules help in a lot of scenario, being able to do such things is not one them. remod 
+made that workflow easier by being able to selectively restore the GOPATH behavior on only a subset
+of the dependencies, while benefiting from go modules for the rest.
+
 ## Installation
 
 To install remod, run:
