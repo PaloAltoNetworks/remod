@@ -8,9 +8,9 @@ When you work on projects with various internal libraries that are working
 closely together, you usually need to have a bit of velocity. For example, the Aporeto ci pipelines 
 are able combine multiple pull requests accross multiple github repositories to test them together.
 
-While go modules help in a lot of scenario, being able to do such things is not one them. remod 
-made that workflow easier by being able to selectively restore the GOPATH behavior on only a subset
-of the dependencies, while benefiting from go modules for the rest.
+While go modules help in a lot of scenarios, being able to do such things is not one them. remod 
+made that workflow easier by selectively restoring the GOPATH behavior on only a subset
+of the dependencies, while benefiting from go modules for the others.
 
 ## Installation
 
