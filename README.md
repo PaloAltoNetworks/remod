@@ -12,9 +12,7 @@ To install remod, run:
 go get go.aporeto.io/remod
 ```
 
-## Usage
-
-### Init
+## Init
 
 If you want to use remod on a repo that does not handle it already, you can run
 
@@ -27,7 +25,7 @@ This will create a `.gitattributes` file and will add the correct git configurat
 > NOTE: if the git attributes already exists, remod will not do anything but will print
 > a command to append what it needed.
 
-### Developement mode
+## Developement mode
 
 remod allows to switch on and off a development mode, where it will
 add replace directives to your go.mod that you cannot commit upstream.
