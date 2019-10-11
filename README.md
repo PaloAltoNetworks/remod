@@ -109,6 +109,8 @@ remod go build
 remod go test -race ./...
 ```
 
+If there is no `go.mod.dev`, `remod go` will simply run the go command, so it will always work.
+
 ## Updating modules
 
 remod allows to simply perform batch modules updgrade.
