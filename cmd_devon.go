@@ -39,10 +39,6 @@ var cmdDevon = &cobra.Command{
 			return fmt.Errorf("you must not set --replace-version if --prefix is local")
 		}
 
-		if err := remod.GitConfig(); err != nil {
-			return fmt.Errorf("unable to install git config: %s", err)
-		}
-
 		idata, err := ioutil.ReadFile("go.mod")
 		if err != nil {
 			return fmt.Errorf("unable to read go.mod: %s", err)
@@ -53,7 +49,7 @@ var cmdDevon = &cobra.Command{
 			return fmt.Errorf("unable to extract modules: %s", err)
 		}
 
-		odata, err := remod.Enable(idata, modules, prefix, version)
+		odata, err := remod.MakeDevMod(idata, modules, prefix, version)
 		if err != nil {
 			return fmt.Errorf("unable to apply dev replacements: %s", err)
 		}
@@ -61,10 +57,10 @@ var cmdDevon = &cobra.Command{
 			return nil
 		}
 
-		if err := ioutil.WriteFile("go.mod", odata, 0655); err != nil {
+		if err := ioutil.WriteFile("go.mod.dev", odata, 0655); err != nil {
 			return err
 		}
 
-		return remod.GitAdd()
+		return nil
 	},
 }

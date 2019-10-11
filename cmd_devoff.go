@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"go.aporeto.io/remod/internal/remod"
 )
 
 var cmdDevoff = &cobra.Command{
@@ -18,23 +16,6 @@ var cmdDevoff = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		idata, err := ioutil.ReadFile("go.mod")
-		if err != nil {
-			return fmt.Errorf("unable to read go.mod: %s", err)
-		}
-
-		odata, err := remod.Disable(idata)
-		if err != nil {
-			return fmt.Errorf("unable to remove dev replacements: %s", err)
-		}
-		if odata == nil {
-			return nil
-		}
-
-		if err := ioutil.WriteFile("go.mod", odata, 0655); err != nil {
-			return err
-		}
-
-		return remod.GitAdd()
+		return os.RemoveAll("go.mod.dev")
 	},
 }

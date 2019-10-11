@@ -1,8 +1,11 @@
 # remod
 
-Remod is a tool to work with local copies of libraries and go modules.
-It provides a cli to manage replacement directives and uses git attributes
-to make the changes invisible from git's point of view.
+remod is a tool to work with local copies of libraries and go modules.
+It provides a cli to manage replacement directives in a file called `go.mod.dev`
+that can be ignored from VSC.
+
+remod also provide `remod go args...` to wrap a standard go command and transparently combining
+the original `go.mod` with the `go.mod.dev`, executing the command, and restoring the original file.
 
 When you work on projects with various internal libraries that are working
 closely together, you usually need to have a bit of velocity. For example, the Aporeto ci pipelines
@@ -20,38 +23,10 @@ To install remod, run:
 go get go.aporeto.io/remod
 ```
 
-## Init
-
-If you want to use remod on a repo that does not handle it already, you can run:
-
-```shell
-remod init
-```
-
-This will create a `.gitattributes` file and will add the correct git configuration in `./.git/config`
-
-> NOTE: if the git attributes file already exists, remod will not do anything but will print
-> a command to append what it needed.
-
 ## Developement mode
 
 remod allows to switch on and off a development mode, where it will
-add replace directives to your `go.mod` file. These changes will be invisible to git so you cannot commit them.
-
-Your replacements will survive accross checkouts (branching, etc.) and will not interfere with other configurations from other people.
-
-You can replace one or multiple libraries, pointing to a local fork
-or to a remote one.
-
-You can write manual replacements, as long as they are between the special comments:
-
-```mod
-// remod:replacements:start
-
-<manual replacements here>
-
-// remod:replacements:end
-```
+add replace directives in a `go.mod.dev` file.
 
 For instance, if we have the following `go.mod`:
 
@@ -72,28 +47,15 @@ To use a local copy of viper, run:
 remod on -m github.com/spf13/viper
 ```
 
-The `go.mod` file will now look like:
+The `go.mod.dev` file will now look like:
 
 ```mod
-module go.aporeto.io/remod
-
-go 1.12
-
-require (
-  github.com/spf13/cobra v0.0.5
-  github.com/spf13/viper v1.4.0
+replace (
+  github.com/spf13/viper => ../viper
 )
-
-// remod:replacements:start
-
-replace github.com/spf13/viper => ../viper
-
-// remod:replacements:end
 ```
 
-You should see no change when doing `git status`.
-
-To turn it off and reset the `go.mod` file, run:
+To to delete the `go.mod.dev`, run:
 
 ```shell
 remod off
@@ -106,26 +68,13 @@ by doing:
 remod on -m github.com/spf13
 ```
 
-Which will modify the `go.mod` file like so:
+Which will modify the `go.mod.dev` file like so:
 
 ```mod
-module go.aporeto.io/remod
-
-go 1.12
-
-require (
-  github.com/spf13/cobra v0.0.5
-  github.com/spf13/viper v1.4.0
-)
-
-// remod:replacements:start
-
 replace (
   github.com/spf13/cobra => ../cobra
   github.com/spf13/viper => ../viper
 )
-
-// remod:replacements:end
 ```
 
 To set a different base path, you can use the option
@@ -137,23 +86,27 @@ For instance:
 remod on -m github.com/spf13/viper --prefix github.com/me/ --replace-version dev
 ```
 
-Which will turn the `go.mod` file to:
+Which will turn the `go.mod.dev` file to:
 
 ```mod
-module go.aporeto.io/remod
-
-go 1.12
-
-require (
-  github.com/spf13/cobra v0.0.5
-  github.com/spf13/viper v1.4.0
+replace (
+  github.com/spf13/viper => github.com/me/viper dev
 )
+```
 
-// remod:replacements:start
+## Wraping go command
 
-replace github.com/spf13/viper => github.com/me/viper dev
+If you run a classic go command, the `go.mod.dev` will of course be ignored.
+You can wrap the go command using `remod go` so `go.mod.dev` will be used.
 
-// remod:replacements:end
+For example:
+
+```shell
+remod go build
+```
+
+```shell
+remod go test -race ./...
 ```
 
 ## Updating modules

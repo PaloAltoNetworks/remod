@@ -27,10 +27,7 @@ func main() {
 		cmdUpdate,
 		cmdDevon,
 		cmdDevoff,
-		cmdGitClean,
-		cmdGitDiff,
-		cmdGitInit,
-		cmdGitSmudge,
+		cmdGo,
 	)
 
 	if err := rootCmd.Execute(); err != nil {
