@@ -78,6 +78,40 @@ func Disable(data []byte) ([]byte, error) {
 	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
 }
 
+// Get returns the remod replacement part.
+func Get(data []byte) ([]byte, error) {
+
+	scanner := bufio.NewScanner(bytes.NewBuffer(data))
+
+	buf := bytes.NewBuffer(nil)
+
+	start := []byte("// remod:replacements:start")
+	end := []byte("// remod:replacements:end")
+
+	var accumulate bool
+	for scanner.Scan() {
+
+		line := scanner.Bytes()
+
+		if bytes.Equal(line, start) {
+			accumulate = true
+		}
+
+		if !accumulate {
+			continue
+		}
+
+		must(buf.Write(line))
+		_ = buf.WriteByte('\n')
+
+		if accumulate && bytes.HasPrefix(line, end) {
+			accumulate = false
+		}
+	}
+
+	return buf.Bytes(), nil
+}
+
 func must(n int, err error) {
 	if err != nil {
 		panic(err)
