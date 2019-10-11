@@ -12,6 +12,8 @@ To install remod, run:
 go get go.aporeto.io/remod
 ```
 
+>  use `go get github.com/aporeto-inc/remod` until vanity url is available
+
 ## Init
 
 If you want to use remod on a repo that does not handle it already, you can run
