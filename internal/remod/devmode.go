@@ -10,11 +10,7 @@ import (
 // Enable will enable remod dev replacements for the given modules.
 func Enable(data []byte, modules []string, base string, version string) ([]byte, error) {
 
-	if len(modules) == 0 {
-		return data, nil
-	}
-
-	if bytes.Contains(data, []byte("// remod:replacements:start")) {
+	if len(modules) == 0 || bytes.Contains(data, []byte("// remod:replacements:start")) {
 		return data, nil
 	}
 
@@ -24,13 +20,18 @@ func Enable(data []byte, modules []string, base string, version string) ([]byte,
 
 	buf := bytes.NewBuffer(data)
 
-	_, _ = buf.WriteString("\n// remod:replacements:start\n\n")
-	_, _ = buf.WriteString("replace (\n")
-	for _, m := range modules {
-		_, _ = buf.WriteString(fmt.Sprintf("\t%s => %s%s%s\n", m, base, filepath.Base(m), version))
+	must(buf.WriteString("\n// remod:replacements:start\n\n"))
+
+	if len(modules) == 1 {
+		must(buf.WriteString(fmt.Sprintf("replace %s => %s%s%s\n", modules[0], base, filepath.Base(modules[0]), version)))
+	} else {
+		must(buf.WriteString("replace (\n"))
+		for _, m := range modules {
+			must(buf.WriteString(fmt.Sprintf("\t%s => %s%s%s\n", m, base, filepath.Base(m), version)))
+		}
+		must(buf.WriteString(")\n"))
 	}
-	_, _ = buf.WriteString(")\n")
-	_, _ = buf.WriteString("\n// remod:replacements:end")
+	must(buf.WriteString("\n// remod:replacements:end"))
 
 	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
 }
@@ -65,7 +66,7 @@ func Disable(data []byte) ([]byte, error) {
 			continue
 		}
 
-		_, _ = buf.Write(line)
+		must(buf.Write(line))
 
 		if !bytes.Equal(last, []byte("\n")) {
 			_ = buf.WriteByte('\n')
@@ -75,4 +76,10 @@ func Disable(data []byte) ([]byte, error) {
 	}
 
 	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
+}
+
+func must(n int, err error) {
+	if err != nil {
+		panic(err)
+	}
 }

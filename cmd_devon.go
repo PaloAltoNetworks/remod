@@ -12,13 +12,13 @@ import (
 func init() {
 	cmdDevon.Flags().StringSliceP("include", "m", nil, "Set the prefix of the modules to include")
 	cmdDevon.Flags().StringSliceP("exclude", "E", nil, "Set the prefix of the modules to exclude")
-	cmdDevon.Flags().StringP("local", "l", "../", "Where the replacements are")
-	cmdDevon.Flags().String("replace-version", "", "Set the version to use for replacement. If empty, it is considered local")
+	cmdDevon.Flags().StringP("prefix", "p", "../", "The prefix to use for the replacements")
+	cmdDevon.Flags().String("replace-version", "", "Set the version to use for replacement. It must be set if prefix is not ../ and must not be if different")
 }
 
 var cmdDevon = &cobra.Command{
-	Use:     "devon",
-	Aliases: []string{"on"},
+	Use:     "on",
+	Aliases: []string{"devon"},
 	Short:   "Apply developpment replace directive",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
@@ -27,8 +27,16 @@ var cmdDevon = &cobra.Command{
 
 		included := viper.GetStringSlice("include")
 		excluded := viper.GetStringSlice("exclude")
-		local := viper.GetString("local")
+		prefix := viper.GetString("prefix")
 		version := viper.GetString("replace-version")
+
+		if prefix != "../" && version == "" {
+			return fmt.Errorf("you must set --replace-version if you set --prefix")
+		}
+
+		if prefix == "../" && version != "" {
+			return fmt.Errorf("you must not set --replace-version if --prefix is '../'")
+		}
 
 		if err := remod.GitConfig(); err != nil {
 			return fmt.Errorf("unable to install git config: %s", err)
@@ -44,7 +52,7 @@ var cmdDevon = &cobra.Command{
 			return fmt.Errorf("unable to extract modules: %s", err)
 		}
 
-		odata, err := remod.Enable(idata, modules, local, version)
+		odata, err := remod.Enable(idata, modules, prefix, version)
 		if err != nil {
 			return fmt.Errorf("unable to apply dev replacements: %s", err)
 		}

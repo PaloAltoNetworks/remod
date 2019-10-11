@@ -10,8 +10,8 @@ import (
 )
 
 var cmdDevoff = &cobra.Command{
-	Use:     "devoff",
-	Aliases: []string{"off"},
+	Use:     "off",
+	Aliases: []string{"devoff"},
 	Short:   "Remove developpment replace directive",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
