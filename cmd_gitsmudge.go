@@ -24,7 +24,7 @@ var cmdGitSmudge = &cobra.Command{
 		}
 
 		smudgefile := makeRepoSmudge()
-		defer os.RemoveAll(smudgefile)
+		defer os.RemoveAll(smudgefile) // nolint: errcheck
 
 		odata, err := ioutil.ReadFile(smudgefile)
 		if err != nil {
