@@ -26,5 +26,10 @@ func Update(modules []string, version string) error {
 		}
 	}
 
+	cmd := exec.Command("go", "mod", "tidy")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("unable to run go mod tidy: %s", err)
+	}
+
 	return nil
 }
