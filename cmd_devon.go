@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,12 +31,12 @@ var cmdDevon = &cobra.Command{
 		prefix := viper.GetString("prefix")
 		version := viper.GetString("replace-version")
 
-		if prefix != "../" && version == "" {
-			return fmt.Errorf("you must set --replace-version if you set --prefix")
+		if !strings.HasPrefix(prefix, ".") && version == "" {
+			return fmt.Errorf("you must set --replace-version if --prefix is not local")
 		}
 
-		if prefix == "../" && version != "" {
-			return fmt.Errorf("you must not set --replace-version if --prefix is '../'")
+		if strings.HasPrefix(prefix, ".") && version != "" {
+			return fmt.Errorf("you must not set --replace-version if --prefix is local")
 		}
 
 		if err := remod.GitConfig(); err != nil {

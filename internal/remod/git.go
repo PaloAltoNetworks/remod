@@ -3,7 +3,6 @@ package remod
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
 )
 
@@ -36,14 +35,6 @@ func GitAdd() error {
 
 // GitInit initializes the .gitattribute file.
 func GitInit() error {
-
-	if _, err := os.Stat(".gitattributes"); err != nil {
-		if !os.IsNotExist(err) {
-			return fmt.Errorf("unable to check for .gitattributes: %s", err)
-		}
-	} else {
-		return nil
-	}
 
 	if err := ioutil.WriteFile(".gitattributes", []byte("go.mod diff=remod filter=remod\n"), 0644); err != nil {
 		return fmt.Errorf("unable to write .gitattributes: %s", err)
