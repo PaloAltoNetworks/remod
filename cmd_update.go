@@ -46,6 +46,10 @@ var cmdUpdate = &cobra.Command{
 			folder = args[0]
 		}
 
+		if remod.IsHardMode() {
+			return fmt.Errorf("unable to up when remod is on in hard mode. run remod off first")
+		}
+
 		recursive := viper.GetBool("recursive")
 		included := viper.GetStringSlice("include")
 		excluded := viper.GetStringSlice("exclude")

@@ -99,6 +99,21 @@ func WrapGoCommand(args ...string) error {
 	return cmd.Run()
 }
 
+// IsHardMode checks if go.mod.bak is present.
+func IsHardMode() bool {
+
+	_, err := os.Stat("go.mod.bak")
+	if err == nil {
+		return true
+	}
+
+	if !os.IsNotExist(err) {
+		panic(err)
+	}
+
+	return false
+}
+
 func must(n int, err error) {
 	if err != nil {
 		panic(err)
