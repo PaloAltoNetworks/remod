@@ -135,7 +135,9 @@ func installPreCommitHook() error {
 		}
 
 		if !bytes.Contains(precommit, preCommitHookBase) {
-			ioutil.WriteFile(".git/hooks/pre-commit", append(precommit, append([]byte("\n"), preCommitHookBase...)...), 0750)
+			if err := ioutil.WriteFile(".git/hooks/pre-commit", append(precommit, append([]byte("\n"), preCommitHookBase...)...), 0750); err != nil {
+				return fmt.Errorf("unable to append pre-commit-remod: %s", err)
+			}
 		}
 	}
 
