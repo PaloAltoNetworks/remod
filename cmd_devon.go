@@ -34,7 +34,6 @@ func init() {
 	cmdDevon.Flags().StringSliceP("exclude", "E", nil, "Set the prefix of the modules to exclude")
 	cmdDevon.Flags().StringP("prefix", "p", "../", "The prefix to use for the replacements")
 	cmdDevon.Flags().String("replace-version", "", "Set the version to use for replacement. It must be set if prefix is not ../ and must not be if different")
-	cmdDevon.Flags().Bool("hard", false, "If set, the original go mod will be backuped and replaced by the dev one")
 }
 
 var cmdDevon = &cobra.Command{
@@ -50,7 +49,6 @@ var cmdDevon = &cobra.Command{
 		excluded := viper.GetStringSlice("exclude")
 		prefix := viper.GetString("prefix")
 		version := viper.GetString("replace-version")
-		hard := viper.GetBool("hard")
 
 		if remod.IsHardMode() {
 			return fmt.Errorf("remod hard is already on")
@@ -64,17 +62,22 @@ var cmdDevon = &cobra.Command{
 			return fmt.Errorf("you must not set --replace-version if --prefix is local")
 		}
 
-		idata, err := ioutil.ReadFile("go.mod")
+		gomod, err := ioutil.ReadFile("go.mod")
 		if err != nil {
 			return fmt.Errorf("unable to read go.mod: %s", err)
 		}
 
-		modules, err := remod.Extract(idata, included, excluded)
+		gosum, err := ioutil.ReadFile("go.sum")
+		if err != nil {
+			return fmt.Errorf("unable to read go.sum: %s", err)
+		}
+
+		modules, err := remod.Extract(gomod, included, excluded)
 		if err != nil {
 			return fmt.Errorf("unable to extract modules: %s", err)
 		}
 
-		odata, err := remod.MakeDevMod(idata, modules, prefix, version)
+		odata, err := remod.MakeDevMod(gomod, modules, prefix, version)
 		if err != nil {
 			return fmt.Errorf("unable to apply dev replacements: %s", err)
 		}
@@ -86,30 +89,21 @@ var cmdDevon = &cobra.Command{
 			return err
 		}
 
-		if hard {
+		if err := os.Rename("go.mod", "go.mod.bak"); err != nil {
+			return fmt.Errorf("unable to backup go.mod: %s", err)
+		}
 
-			if err := os.Rename("go.mod", "go.mod.bak"); err != nil {
-				return fmt.Errorf("unable to backup go.mod: %s", err)
-			}
+		if err := ioutil.WriteFile("go.mod", append(gomod, odata...), 0644); err != nil {
+			return fmt.Errorf("unable to write build go.mod: %s", err)
+		}
 
-			if err := ioutil.WriteFile("go.mod", append(idata, odata...), 0644); err != nil {
-				return fmt.Errorf("unable to write build go.mod: %s", err)
-			}
+		if err := ioutil.WriteFile("go.sum.bak", gosum, 0644); err != nil {
+			return fmt.Errorf("unable to write go.sum.bak: %s", err)
+		}
 
-			// read go.sum
-			gosum, err := ioutil.ReadFile("go.sum")
-			if err != nil {
-				return fmt.Errorf("unable to read go.sum: %s", err)
-			}
-
-			if err := ioutil.WriteFile("go.sum.bak", gosum, 0644); err != nil {
-				return fmt.Errorf("unable to write go.sum.bak: %s", err)
-			}
-
-			// install the git hook
-			if err := installPreCommitHook(); err != nil {
-				return fmt.Errorf("unable to manage pre commit hook: %s", err)
-			}
+		// install the git hook
+		if err := installPreCommitHook(); err != nil {
+			return fmt.Errorf("unable to manage pre commit hook: %s", err)
 		}
 
 		return nil

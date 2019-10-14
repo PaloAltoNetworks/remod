@@ -17,7 +17,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"go.aporeto.io/remod/internal/remod"
 )
 
 var cmdDevoff = &cobra.Command{
@@ -29,18 +28,12 @@ var cmdDevoff = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if remod.IsHardMode() {
-			if err := os.Rename("go.mod.bak", "go.mod"); err != nil {
-				return fmt.Errorf("unable to restore go.mod: %s", err)
-			}
+		if err := os.Rename("go.mod.bak", "go.mod"); err != nil {
+			return fmt.Errorf("unable to restore go.mod: %s", err)
+		}
 
-			if err := os.Rename("go.sum.bak", "go.sum"); err != nil {
-				return fmt.Errorf("unable to restore go.mod: %s", err)
-			}
-		} else {
-			if err := os.RemoveAll("go.mod.dev"); err != nil {
-				return fmt.Errorf("unable to remove go.mod.bak: %s", err)
-			}
+		if err := os.Rename("go.sum.bak", "go.sum"); err != nil {
+			return fmt.Errorf("unable to restore go.mod: %s", err)
 		}
 
 		return nil
