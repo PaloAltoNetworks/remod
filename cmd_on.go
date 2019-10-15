@@ -12,30 +12,24 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.aporeto.io/remod/internal/remod"
 )
 
-var cmdDevoff = &cobra.Command{
-	Use:     "off",
-	Aliases: []string{"devoff"},
-	Short:   "Remove developpment replace directive",
+var cmdOn = &cobra.Command{
+	Use:   "on",
+	Short: "Apply developpment replace directive",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if err := os.Rename("go.mod.bak", "go.mod"); err != nil {
-			return fmt.Errorf("unable to restore go.mod: %s", err)
+		if err := remod.On(); err != nil {
+			return err
 		}
 
-		if err := os.Rename("go.sum.bak", "go.sum"); err != nil {
-			return fmt.Errorf("unable to restore go.mod: %s", err)
-		}
-
-		return nil
+		return remod.GitAdd()
+		// return nil
 	},
 }

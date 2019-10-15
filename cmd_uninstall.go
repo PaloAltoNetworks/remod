@@ -12,21 +12,31 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.aporeto.io/remod/internal/remod"
 )
 
-var cmdGo = &cobra.Command{
-	Use:                "go",
-	Aliases:            []string{"g"},
-	Short:              "Run a go command wrapped so it used go.mod.dev",
-	DisableFlagParsing: true,
+var cmdUninstall = &cobra.Command{
+	Use:     "uninstall",
+	Aliases: []string{"u"},
+	Short:   "Remove developpment replace directive",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		return remod.WrapGoCommand(args...)
+		if remod.IsEnabled() {
+			return fmt.Errorf("run remod off first")
+		}
+
+		if err := os.RemoveAll(remod.GoDev); err != nil {
+			return fmt.Errorf("unable to restore go.mod: %s", err)
+		}
+
+		return nil
 	},
 }

@@ -12,42 +12,24 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.aporeto.io/remod/internal/remod"
 )
 
-func main() {
+var cmdOff = &cobra.Command{
+	Use:   "off",
+	Short: "Remove developpment replace directive",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return viper.BindPFlags(cmd.Flags())
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
 
-	cobra.OnInitialize(func() {
-		viper.SetEnvPrefix("remod")
-		viper.AutomaticEnv()
-		viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	})
+		if err := remod.Off(); err != nil {
+			return err
+		}
 
-	var rootCmd = &cobra.Command{
-		Use:           "remod",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-
-	rootCmd.AddCommand(
-		cmdInstall,
-		cmdUninstall,
-		cmdOn,
-		cmdOff,
-		cmdGet,
-
-		cmdGitClean,
-		cmdGitDiff,
-		cmdGitSmudge,
-	)
-
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		os.Exit(1)
-	}
+		return remod.GitAdd()
+		// return nil
+	},
 }
