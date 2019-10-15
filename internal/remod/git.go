@@ -131,5 +131,5 @@ func branchName() (string, error) {
 		return "", err
 	}
 
-	return strings.ReplaceAll(string(out), "/", "_"), nil
+	return strings.Trim(strings.ReplaceAll(strings.TrimPrefix(string(out), "heads/"), "/", "_"), "\n\t"), nil
 }

@@ -39,6 +39,7 @@ func main() {
 		cmdUninstall,
 		cmdOn,
 		cmdOff,
+		cmdUpdate,
 		cmdGet,
 
 		cmdGitClean,

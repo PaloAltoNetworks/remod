@@ -13,113 +13,48 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path"
-	"path/filepath"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.aporeto.io/remod/internal/remod"
 )
 
-func init() {
-	cmdGet.Flags().StringSliceP("exclude", "E", nil, "Set the prefix of the modules to exclude")
-	cmdGet.Flags().StringSliceP("folder", "f", []string{"."}, "Set the path to the folder file")
-	cmdGet.Flags().BoolP("recursive", "r", false, "If true, remod will look for mod files in given --folder and all 1 level subfolders")
-	cmdGet.Flags().String("version", "latest", "Set to which version you want to update the matching modules")
-}
-
 var cmdGet = &cobra.Command{
-	Use:     "get",
-	Aliases: []string{"up"},
-	Short:   "Update the modules in the given path",
+	Use:                "get",
+	Aliases:            []string{"g"},
+	Short:              "Run a wrapper go get command",
+	DisableFlagParsing: true,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		folders := viper.GetStringSlice("folder")
-
 		if len(args) == 0 {
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if remod.Enabled() {
-			if err := remod.Off(); err != nil {
-				return fmt.Errorf("unable to set remod to off: %s", err)
-			}
-			defer func() {
-				if err := remod.On(); err != nil {
-					panic(err)
-				}
-			}()
+		if err := remod.Off(); err != nil {
+			return fmt.Errorf("unable to set remod to off: %s", err)
 		}
 
-		included := args
-		recursive := viper.GetBool("recursive")
-		excluded := viper.GetStringSlice("exclude")
-		version := viper.GetString("version")
-
-		for _, folder := range folders {
-
-			var paths []string
-
-			if recursive && folder != "." {
-
-				items, err := ioutil.ReadDir(folder)
-				if err != nil {
-					return fmt.Errorf("unable to list content of dir: %s", err)
-				}
-
-				for _, item := range items {
-					if !item.IsDir() {
-						continue
-					}
-
-					p := path.Join(folder, item.Name(), "go.mod")
-					_, err := os.Stat(p)
-					if err != nil {
-						if os.IsNotExist(err) {
-							continue
-						}
-						return fmt.Errorf("unable stat path '%s': %s", p, err)
-					}
-
-					paths = append(paths, p)
-				}
-			} else {
-				paths = append(paths, path.Join(folder, "go.mod"))
+		defer func() {
+			if err := remod.On(); err != nil {
+				panic(err)
 			}
+		}()
 
-			for _, p := range paths {
+		c := exec.Command("go", append([]string{"get"}, args...)...)
+		c.Stdin = os.Stdin
+		c.Stderr = os.Stderr
+		c.Stdout = os.Stdout
 
-				basedir := filepath.Dir(p)
-				if err := os.Chdir(basedir); err != nil {
-					return fmt.Errorf("unable to move to %s: %s", basedir, err)
-				}
-
-				if len(paths) > 1 {
-					fmt.Println("* Entering", basedir)
-				}
-
-				idata, err := ioutil.ReadFile(p)
-				if err != nil {
-					return fmt.Errorf("unable to read go.mod: %s", err)
-				}
-
-				modules, err := remod.Extract(idata, included, excluded)
-				if err != nil {
-					return fmt.Errorf("unable to extract modules: %s", err)
-				}
-
-				if err := remod.Update(modules, version); err != nil {
-					return fmt.Errorf("unable to extract modules: %s", err)
-				}
-			}
+		if err := c.Start(); err != nil {
+			return err
 		}
 
-		return nil
+		return c.Wait()
 	},
 }

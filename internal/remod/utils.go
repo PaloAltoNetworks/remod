@@ -41,26 +41,23 @@ func strip(in []byte) ([]byte, error) {
 
 	buf := bytes.NewBuffer(nil)
 
-	start := []byte(remodStart)
-	end := []byte(remodEnd)
-
-	var strip bool
+	var skip bool
 	var last []byte
 	for scanner.Scan() {
 
 		line := scanner.Bytes()
 
-		if bytes.Equal(line, start) {
-			strip = true
+		if bytes.Equal(append(line, '\n'), remodStart) {
+			skip = true
 			continue
 		}
 
-		if strip && bytes.Equal(line, end) {
-			strip = false
+		if skip && bytes.Equal(append(line, '\n'), remodEnd) {
+			skip = false
 			continue
 		}
 
-		if strip {
+		if skip {
 			continue
 		}
 

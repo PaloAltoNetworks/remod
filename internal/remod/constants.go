@@ -3,9 +3,7 @@ package remod
 import "fmt"
 
 const (
-	goDev     = "remod.dev"
-	modBackup = ".remod/mod"
-	sumBackup = ".remod/sum"
+	goDev = "remod.dev"
 )
 
 var (
@@ -20,7 +18,7 @@ func goModBackup() string {
 		panic(err)
 	}
 
-	return fmt.Sprintf("%s.%s", modBackup, br)
+	return fmt.Sprintf(".remod/%s.mod", br)
 }
 
 func goSumBackup() string {
@@ -30,5 +28,5 @@ func goSumBackup() string {
 		panic(err)
 	}
 
-	return fmt.Sprintf("%s.%s", sumBackup, br)
+	return fmt.Sprintf(".remod/%s.sum", br)
 }
