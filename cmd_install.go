@@ -12,10 +12,6 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.aporeto.io/remod/internal/remod"
@@ -37,46 +33,20 @@ var cmdInstall = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		included := viper.GetStringSlice("include")
-		excluded := viper.GetStringSlice("exclude")
-		prefix := viper.GetString("prefix")
-		version := viper.GetString("replace-version")
-
-		if remod.IsEnabled() {
-			return fmt.Errorf("remod is already on")
+		if err := remod.Install(
+			viper.GetString("prefix"),
+			viper.GetString("replace-version"),
+			viper.GetStringSlice("include"),
+			viper.GetStringSlice("exclude"),
+		); err != nil {
+			return err
 		}
 
 		if err := remod.GitConfig(); err != nil {
 			return err
 		}
 
-		if !strings.HasPrefix(prefix, ".") && version == "" {
-			return fmt.Errorf("you must set --replace-version if --prefix is not local")
-		}
-
-		if strings.HasPrefix(prefix, ".") && version != "" {
-			return fmt.Errorf("you must not set --replace-version if --prefix is local")
-		}
-
-		gomod, err := ioutil.ReadFile("go.mod")
-		if err != nil {
-			return fmt.Errorf("unable to read go.mod: %s", err)
-		}
-
-		modules, err := remod.Extract(gomod, included, excluded)
-		if err != nil {
-			return fmt.Errorf("unable to extract modules: %s", err)
-		}
-
-		odata, err := remod.MakeDevMod(gomod, modules, prefix, version)
-		if err != nil {
-			return fmt.Errorf("unable to apply dev replacements: %s", err)
-		}
-		if odata == nil {
-			return nil
-		}
-
-		if err := ioutil.WriteFile(remod.GoDev, odata, 0655); err != nil {
+		if err := remod.GitInit(); err != nil {
 			return err
 		}
 

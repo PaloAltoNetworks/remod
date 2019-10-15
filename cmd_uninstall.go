@@ -12,9 +12,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.aporeto.io/remod/internal/remod"
@@ -29,14 +26,6 @@ var cmdUninstall = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if remod.IsEnabled() {
-			return fmt.Errorf("run remod off first")
-		}
-
-		if err := os.RemoveAll(remod.GoDev); err != nil {
-			return fmt.Errorf("unable to restore go.mod: %s", err)
-		}
-
-		return nil
+		return remod.Uninstall()
 	},
 }

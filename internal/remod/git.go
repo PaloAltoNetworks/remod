@@ -2,6 +2,7 @@ package remod
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os/exec"
 )
@@ -9,19 +10,19 @@ import (
 // GitConfig installs the needed git config
 func GitConfig() error {
 
-	// cmd1 := exec.Command("git", "config", "diff.remod.textconv", "remod gitdiff")
+	// cmd1 := exec.Command("git", "config", "diff.textconv", "remod gitdiff")
 	// if err := cmd1.Run(); err != nil {
 	// 	return fmt.Errorf("unable to update git config for diff.remod: %s", err)
 	// }
 
-	cmd2 := exec.Command("git", "config", "filter.remod.clean", "remod gitclean %f")
+	cmd2 := exec.Command("git", "config", "filter.clean", "remod gitclean %f")
 	if err := cmd2.Run(); err != nil {
-		return fmt.Errorf("unable to update git config for filter.remod.clean: %s", err)
+		return fmt.Errorf("unable to update git config for filter.clean: %s", err)
 	}
 
-	cmd3 := exec.Command("git", "config", "filter.remod.smudge", "remod gitsmudge %f")
+	cmd3 := exec.Command("git", "config", "filter.smudge", "remod gitsmudge %f")
 	if err := cmd3.Run(); err != nil {
-		return fmt.Errorf("unable to update git config for filter.remod.smudge: %s", err)
+		return fmt.Errorf("unable to update git config for filter.smudge: %s", err)
 	}
 
 	return nil
@@ -46,4 +47,78 @@ func GitInit() error {
 	}
 
 	return nil
+}
+
+// GitFilterClean is used by git filter.
+func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
+
+	idata, err := ioutil.ReadAll(input)
+	if err != nil {
+		return fmt.Errorf("unable to read input: %s", err)
+	}
+
+	if !IsEnabled() {
+		_, err = output.Write(idata)
+		return err
+	}
+
+	switch filename {
+
+	case "go.mod":
+
+		gomod, err := ioutil.ReadFile(goModBackup)
+		if err != nil {
+			return fmt.Errorf("unable to update previous bak: %s", err)
+		}
+
+		_, err = output.Write(gomod)
+		return err
+
+	case "go.sum":
+
+		gosum, err := ioutil.ReadFile(goSumBackup)
+		if err != nil {
+			return fmt.Errorf("unable to update previous bak: %s", err)
+		}
+
+		_, err = output.Write(gosum)
+		return err
+	}
+
+	return nil
+}
+
+// GitFilterSmudge is used by git filter.
+func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
+
+	idata, err := ioutil.ReadAll(input)
+	if err != nil {
+		return fmt.Errorf("unable to read input: %s", err)
+	}
+
+	if !IsEnabled() {
+		_, err = output.Write(idata)
+		return err
+	}
+
+	switch filename {
+
+	case "go.mod":
+
+		godev, err := ioutil.ReadFile(goDev)
+		if err != nil {
+			return fmt.Errorf("unable to read %s: %s", goDev, err)
+		}
+
+		_, err = output.Write(append(idata, append([]byte("\n"), godev...)...))
+		return err
+
+	case "go.sum":
+
+		_, err = output.Write(idata)
+		return err
+
+	default:
+		return fmt.Errorf("received non go.mod and non go.sum: %s", filename)
+	}
 }

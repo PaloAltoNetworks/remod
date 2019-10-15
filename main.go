@@ -42,7 +42,6 @@ func main() {
 		cmdGet,
 
 		cmdGitClean,
-		cmdGitDiff,
 		cmdGitSmudge,
 	)
 

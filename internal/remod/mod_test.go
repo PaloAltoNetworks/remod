@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-func TestMakeDevMod(t *testing.T) {
+func TestMakeGoModDev(t *testing.T) {
 
 	gomod := []byte(`module go.aporeto.io/test
 
@@ -125,13 +125,13 @@ require cloud.google.com/go/storage v1.1.0 // indirect
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MakeDevMod(tt.args.data, tt.args.modules, tt.args.base, tt.args.version)
+			got, err := makeGoModDev(tt.args.data, tt.args.modules, tt.args.base, tt.args.version)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MakeDevMod() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("makeGoModDev() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeDevMod() = >>%v<<, want >>%v<<", string(got), string(tt.want))
+				t.Errorf("makeGoModDev() = >>%v<<, want >>%v<<", string(got), string(tt.want))
 			}
 		})
 	}
