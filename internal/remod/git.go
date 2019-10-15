@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os/exec"
+	"strings"
 )
 
 // GitConfig installs the needed git config
@@ -66,7 +67,7 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 
 	case "go.mod":
 
-		gomod, err := ioutil.ReadFile(goModBackup)
+		gomod, err := ioutil.ReadFile(goModBackup())
 		if err != nil {
 			return fmt.Errorf("unable to update previous bak: %s", err)
 		}
@@ -76,7 +77,7 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 
 	case "go.sum":
 
-		gosum, err := ioutil.ReadFile(goSumBackup)
+		gosum, err := ioutil.ReadFile(goSumBackup())
 		if err != nil {
 			return fmt.Errorf("unable to update previous bak: %s", err)
 		}
@@ -121,4 +122,14 @@ func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
 	default:
 		return fmt.Errorf("received non go.mod and non go.sum: %s", filename)
 	}
+}
+
+func branchName() (string, error) {
+
+	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+	if err != nil {
+		return "", err
+	}
+
+	return strings.ReplaceAll(string(out), "/", "_"), nil
 }

@@ -1,6 +1,7 @@
 package remod
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"path/filepath"
@@ -32,4 +33,66 @@ func must(n int, err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func strip(in []byte) ([]byte, error) {
+
+	scanner := bufio.NewScanner(bytes.NewBuffer(in))
+
+	buf := bytes.NewBuffer(nil)
+
+	start := []byte(remodStart)
+	end := []byte(remodEnd)
+
+	var strip bool
+	var last []byte
+	for scanner.Scan() {
+
+		line := scanner.Bytes()
+
+		if bytes.Equal(line, start) {
+			strip = true
+			continue
+		}
+
+		if strip && bytes.Equal(line, end) {
+			strip = false
+			continue
+		}
+
+		if strip {
+			continue
+		}
+
+		must(buf.Write(line))
+
+		if !bytes.Equal(last, []byte("\n")) {
+			must(buf.WriteRune('\n'))
+		}
+
+		last = line
+	}
+
+	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
+}
+
+func prepareGoDev(godev []byte) []byte {
+
+	buf := bytes.NewBuffer(nil)
+	must(buf.Write(remodStart))
+	must(buf.WriteRune('\n'))
+	must(buf.Write(godev))
+	must(buf.WriteRune('\n'))
+	must(buf.Write(remodEnd))
+
+	return buf.Bytes()
+}
+
+func assemble(gomod, godev []byte) []byte {
+
+	buf := bytes.NewBuffer(gomod)
+	must(buf.WriteRune('\n'))
+	must(buf.Write(godev))
+
+	return buf.Bytes()
 }
