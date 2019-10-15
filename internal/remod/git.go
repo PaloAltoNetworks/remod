@@ -57,7 +57,7 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 		return fmt.Errorf("unable to read input: %s", err)
 	}
 
-	if !IsEnabled() {
+	if !Enabled() {
 		_, err = output.Write(idata)
 		return err
 	}
@@ -96,7 +96,7 @@ func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
 		return fmt.Errorf("unable to read input: %s", err)
 	}
 
-	if !IsEnabled() {
+	if !Enabled() {
 		_, err = output.Write(idata)
 		return err
 	}

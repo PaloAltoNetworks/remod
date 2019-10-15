@@ -46,7 +46,7 @@ var cmdGet = &cobra.Command{
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if remod.IsEnabled() {
+		if remod.Enabled() {
 			if err := remod.Off(); err != nil {
 				return fmt.Errorf("unable to set remod to off: %s", err)
 			}

@@ -18,8 +18,8 @@ import (
 	"strings"
 )
 
-// IsEnabled checks if remod is enabled.
-func IsEnabled() bool {
+// Enabled checks if remod is enabled.
+func Enabled() bool {
 
 	_, err := os.Stat(goModBackup)
 	if err == nil {
@@ -36,7 +36,7 @@ func IsEnabled() bool {
 // Install installs go mod in the current repo.
 func Install(prefix string, version string, included []string, excluded []string) error {
 
-	if IsEnabled() {
+	if Enabled() {
 		return fmt.Errorf("remod is already on")
 	}
 
@@ -76,7 +76,7 @@ func Install(prefix string, version string, included []string, excluded []string
 // On enables remod
 func On() error {
 
-	if IsEnabled() {
+	if Enabled() {
 		return nil
 	}
 
@@ -121,7 +121,7 @@ func On() error {
 // Off disables remod
 func Off() error {
 
-	if !IsEnabled() {
+	if !Enabled() {
 		return nil
 	}
 
@@ -153,7 +153,7 @@ func Off() error {
 // Uninstall uninstalls go mod from the current repo.
 func Uninstall() error {
 
-	if IsEnabled() {
+	if Enabled() {
 		return fmt.Errorf("run remod off first")
 	}
 
