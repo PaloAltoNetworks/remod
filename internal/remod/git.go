@@ -1,6 +1,7 @@
 package remod
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,12 +17,12 @@ func GitConfig() error {
 	// 	return fmt.Errorf("unable to update git config for diff.remod: %s", err)
 	// }
 
-	cmd2 := exec.Command("git", "config", "filter.remod.clean", "remod gitclean %f")
+	cmd2 := exec.Command("git", "config", "filter.remod.clean", "remod gitclean")
 	if err := cmd2.Run(); err != nil {
 		return fmt.Errorf("unable to update git config for filter.clean: %s", err)
 	}
 
-	cmd3 := exec.Command("git", "config", "filter.remod.smudge", "remod gitsmudge %f")
+	cmd3 := exec.Command("git", "config", "filter.remod.smudge", "remod gitsmudge")
 	if err := cmd3.Run(); err != nil {
 		return fmt.Errorf("unable to update git config for filter.smudge: %s", err)
 	}
@@ -51,7 +52,7 @@ func GitInit() error {
 }
 
 // GitFilterClean is used by git filter.
-func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
+func GitFilterClean(input io.Reader, output io.Writer) error {
 
 	idata, err := ioutil.ReadAll(input)
 	if err != nil {
@@ -63,9 +64,7 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 		return nil
 	}
 
-	switch filename {
-
-	case "go.mod":
+	if bytes.Contains(idata, []byte("module ")) {
 
 		mbak := goModBackup()
 		gomod, err := ioutil.ReadFile(mbak)
@@ -77,7 +76,7 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 
 		return nil
 
-	case "go.sum":
+	} else if bytes.Contains(idata, []byte(" h1:")) {
 
 		sbak := goSumBackup()
 		gosum, err := ioutil.ReadFile(sbak)
@@ -89,14 +88,13 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 
 		return nil
 
-	default:
-
-		panic(fmt.Errorf("received non go.mod and non go.sum: %s", filename))
 	}
+
+	panic(fmt.Errorf("received non go.mod and non go.sum: %s", string(idata)))
 }
 
 // GitFilterSmudge is used by git filter.
-func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
+func GitFilterSmudge(input io.Reader, output io.Writer) error {
 
 	idata, err := ioutil.ReadAll(input)
 	if err != nil {
@@ -108,11 +106,10 @@ func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
 		return nil
 	}
 
-	switch filename {
-
-	case "go.mod":
+	if bytes.Contains(idata, []byte("module ")) {
 
 		godev, err := ioutil.ReadFile(goDev)
+
 		if err != nil {
 			return fmt.Errorf("unable to read %s: %s", goDev, err)
 		}
@@ -121,16 +118,14 @@ func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
 
 		return nil
 
-	case "go.sum":
+	} else if bytes.Contains(idata, []byte(" h1:")) {
 
 		must(output.Write(idata))
 
 		return nil
-
-	default:
-
-		panic(fmt.Errorf("received non go.mod and non go.sum: %s", filename))
 	}
+
+	panic(fmt.Errorf("received non go.mod and non go.sum: %s", string(idata)))
 }
 
 func branchName() (string, error) {

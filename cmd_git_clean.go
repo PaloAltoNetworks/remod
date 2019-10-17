@@ -17,6 +17,6 @@ var cmdGitClean = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		return remod.GitFilterClean(args[0], os.Stdin, os.Stdout)
+		return remod.GitFilterClean(os.Stdin, os.Stdout)
 	},
 }

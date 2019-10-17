@@ -29,11 +29,14 @@ var cmdOn = &cobra.Command{
 			return err
 		}
 
+		if err := remod.GitConfig(); err != nil {
+			return err
+		}
+
 		if err := remod.On(); err != nil {
 			return err
 		}
 
-		// return remod.GitAdd()
-		return nil
+		return remod.GitAdd()
 	},
 }

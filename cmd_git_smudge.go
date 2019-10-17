@@ -17,6 +17,6 @@ var cmdGitSmudge = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		return remod.GitFilterSmudge(args[0], os.Stdin, os.Stdout)
+		return remod.GitFilterSmudge(os.Stdin, os.Stdout)
 	},
 }
