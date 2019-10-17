@@ -1,11 +1,9 @@
 # remod
 
 remod is a tool to work with local copies of libraries and go modules.
-It provides a cli to manage replacement directives in a file called `go.mod.dev`
-that can be ignored from VSC.
-
-remod also provide `remod go args...` to wrap a standard go command and transparently combining
-the original `go.mod` with the `go.mod.dev`, executing the command, and restoring the original file.
+It provides a cli to manage replacement directives in a file called `remod.dev`
+that can be ignored from VSC. Remod also uses git attributes to make the changes
+applied to the `go.mod` file completely transparent.
 
 When you work on projects with various internal libraries that are working
 closely together, you usually need to have a bit of velocity. For example, the Aporeto ci pipelines
@@ -23,43 +21,22 @@ To install remod, run:
 go get go.aporeto.io/remod
 ```
 
-## Developement mode
+## Working with remod
 
-remod allows to switch on and off a development mode, where it will
-add replace directives in a `go.mod.dev` file.
+### Initialization
 
-For instance, if we have the following `go.mod`:
-
-```mod
-module go.aporeto.io/remod
-
-go 1.12
-
-require (
-  github.com/spf13/cobra v0.0.5
-  github.com/spf13/viper v1.4.0
-)
-```
-
-To use a local copy of viper, run:
+If you never used remod on that repo, you need to
+first run:
 
 ```shell
-remod on -m github.com/spf13/viper
+remod install
 ```
 
-The `go.mod.dev` file will now look like:
+This will add a the necessary `.gitattributes`, and configure your
+clone to ignore the relevant changes in the `go.mod` and `go.sum` files.
 
-```mod
-replace (
-  github.com/spf13/viper => ../viper
-)
-```
-
-To to delete the `go.mod.dev`, run:
-
-```shell
-remod off
-```
+You can then edit the `remod.dev` file with the replacements you want.
+You can also decide to preconfigure the replacements using the `--include` and `--exclude` flags.
 
 The modules you pass are actually used as prefix, so you can replace all the packages from `github.com/spf13`
 by doing:
@@ -68,7 +45,7 @@ by doing:
 remod on -m github.com/spf13
 ```
 
-Which will modify the `go.mod.dev` file like so:
+Which will modify the `remod.dev` file like so:
 
 ```mod
 replace (
@@ -86,7 +63,7 @@ For instance:
 remod on -m github.com/spf13/viper --prefix github.com/me/ --replace-version dev
 ```
 
-Which will turn the `go.mod.dev` file to:
+Which will turn the `remod.dev` file to:
 
 ```mod
 replace (
@@ -94,47 +71,88 @@ replace (
 )
 ```
 
-## Wraping go command
+It is safe to edit the `remod.dev` file manually as you wish.
 
-If you run a classic go command, the `go.mod.dev` will of course be ignored.
-You can wrap the go command using `remod go` so `go.mod.dev` will be used.
+### Activating remod for the branch
 
-For example:
+> Note: If you've cloned a fresh repo, or switched to a new branch,
+> you need to run `remod on` again before being able to use it.
+> Running `remod on` is idempotent and will align what needs to be aligned.
 
-```shell
-remod go build
+remod allows to switch on and off the development mode at will, where it will
+add replace directives from `remod.dev` file in your `go.mod` file.
+
+For instance, if we have the following `go.mod`:
+
+```mod
+module go.aporeto.io/remod
+
+go 1.12
+
+require (
+  github.com/spf13/cobra v0.0.5
+  github.com/spf13/viper v1.4.0
+)
 ```
 
-```shell
-remod go test -race ./...
+And `remod.dev` contains:
+
+```mod
+replace github.com/spf13/viper => ../viper
 ```
 
-If there is no `go.mod.dev`, `remod go` will simply run the go command, so it will always work.
-
-## Updating modules
-
-remod allows to simply perform batch modules updgrade.
-
-For instance, to update viper:
+You can enable the development mode by running:
 
 ```shell
-remod up -m github.com/spf13/viper --version master
+remod on
 ```
 
-The given modules is also matched on a prefix, so to update all modules from spf13:
+The `go.mod` file will now look like:
+
+```mod
+module go.aporeto.io/remod
+
+go 1.12
+
+require (
+  github.com/spf13/cobra v0.0.5
+  github.com/spf13/viper v1.4.0
+)
+
+// remod:start
+
+replace github.com/spf13/viper => ../viper
+
+// remod:end
+```
+
+You should see no change from the git point of view.
+
+### Updating or installing new modules
+
+If you need to update or add a new module that must end up in the final `go.mod` you need to
+run the following command:
 
 ```shell
-remod up -m github.com/spf13 --version master
+remod get github.com/user/repo
 ```
 
-By default, `remod up` targes the working directory, but you can target one or more folders:
+This will transparently restore the original `go.mod`, run the add the new dependency, and reactivate
+the development mode. If development mode was not active, it will work as usual.
+
+`remod get` will blindly pass all arguments to the underlying `go get` command, so anything supported by
+go get command can be done through remod.
+
+> Note: if you simply run go get while remod is on, you will loose the change.
+
+### Deactivating remod for the branch
+
+You cam turn off the development mode for the current branch by running:
 
 ```shell
-remod up -m github.com/spf13 --version master /path/to/my/module1 /path/to/my/module2
+remod off
 ```
 
-Or simply do it recursively from one folder:
-
-```shell
-remod up -m github.com/spf13 --version master /path/to/my/modules -r
-```
+This will restore the original `go.mod` and `go.sum` file.
+Note that this only affects the current branch. You can run `remod on` again
+at any time to start development mode again.

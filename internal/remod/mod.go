@@ -170,6 +170,10 @@ func Uninstall() error {
 		return fmt.Errorf("run remod off first")
 	}
 
+	if err := GitRemoveConfig(); err != nil {
+		return fmt.Errorf("unable to restore git config: %s", err)
+	}
+
 	if err := os.RemoveAll(goDev); err != nil {
 		return fmt.Errorf("unable to restore go.mod: %s", err)
 	}
