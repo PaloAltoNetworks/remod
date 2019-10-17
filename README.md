@@ -156,3 +156,24 @@ remod off
 This will restore the original `go.mod` and `go.sum` file.
 Note that this only affects the current branch. You can run `remod on` again
 at any time to start development mode again.
+
+### Updating modules in bulk
+
+The command `remod update` allows to update all modules with a prefix at once.
+
+For instance, to update all modules from `go.aporeto.io` in the current project, you can run:
+
+```shell
+remod up go.aporeto.io
+```
+
+It will udpate the the `latest` tag by default.
+
+You can change this behavior by setting the `--version` flag, and exclude some modules with
+the `--exclude` flag.
+
+For instance:
+
+```shell
+remod up go.aporeto.io --version master --exclude go.aporeto.io/trireme-lib
+```
