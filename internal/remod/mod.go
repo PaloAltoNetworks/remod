@@ -58,10 +58,7 @@ func Install(prefix string, version string, included []string, excluded []string
 		return fmt.Errorf("unable to extract modules: %s", err)
 	}
 
-	odata, err := makeGoModDev(gomod, modules, prefix, version)
-	if err != nil {
-		return fmt.Errorf("unable to apply dev replacements: %s", err)
-	}
+	odata := makeGoModDev(modules, prefix, version)
 	if odata == nil {
 		return nil
 	}
@@ -93,10 +90,7 @@ func On() error {
 	}
 
 	// we strip any previous remod replacements
-	gomod, err = strip(gomod)
-	if err != nil {
-		return fmt.Errorf("unable to strip original gomod: %s", err)
-	}
+	gomod = strip(gomod)
 
 	mbak := goModBackup()
 	sback := goSumBackup()

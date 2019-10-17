@@ -8,7 +8,7 @@ import (
 )
 
 // makeGoModDev builds the dev mod file.
-func makeGoModDev(data []byte, modules []string, base string, version string) ([]byte, error) {
+func makeGoModDev(modules []string, base string, version string) []byte {
 
 	if version != "" {
 		version = " " + version
@@ -29,7 +29,7 @@ func makeGoModDev(data []byte, modules []string, base string, version string) ([
 		must(buf.WriteString(")\n"))
 	}
 
-	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
+	return append(bytes.TrimSpace(buf.Bytes()), '\n')
 }
 
 func must(n int, err error) {
@@ -38,7 +38,7 @@ func must(n int, err error) {
 	}
 }
 
-func strip(in []byte) ([]byte, error) {
+func strip(in []byte) []byte {
 
 	scanner := bufio.NewScanner(bytes.NewBuffer(in))
 
@@ -73,7 +73,7 @@ func strip(in []byte) ([]byte, error) {
 		last = line
 	}
 
-	return append(bytes.TrimSpace(buf.Bytes()), '\n'), nil
+	return append(bytes.TrimSpace(buf.Bytes()), '\n')
 }
 
 func prepareGoDev(godev []byte) []byte {
