@@ -29,7 +29,7 @@ var cmdOff = &cobra.Command{
 			return err
 		}
 
-		return remod.GitAdd()
-		// return nil
+		// return remod.GitAdd()
+		return nil
 	},
 }

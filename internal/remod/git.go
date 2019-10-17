@@ -16,12 +16,12 @@ func GitConfig() error {
 	// 	return fmt.Errorf("unable to update git config for diff.remod: %s", err)
 	// }
 
-	cmd2 := exec.Command("git", "config", "filter.clean", "remod gitclean %f")
+	cmd2 := exec.Command("git", "config", "filter.remod.clean", "remod gitclean %f")
 	if err := cmd2.Run(); err != nil {
 		return fmt.Errorf("unable to update git config for filter.clean: %s", err)
 	}
 
-	cmd3 := exec.Command("git", "config", "filter.smudge", "remod gitsmudge %f")
+	cmd3 := exec.Command("git", "config", "filter.remod.smudge", "remod gitsmudge %f")
 	if err := cmd3.Run(); err != nil {
 		return fmt.Errorf("unable to update git config for filter.smudge: %s", err)
 	}

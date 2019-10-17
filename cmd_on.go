@@ -25,11 +25,15 @@ var cmdOn = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		if err := remod.Off(); err != nil {
+			return err
+		}
+
 		if err := remod.On(); err != nil {
 			return err
 		}
 
-		return remod.GitAdd()
-		// return nil
+		// return remod.GitAdd()
+		return nil
 	},
 }
