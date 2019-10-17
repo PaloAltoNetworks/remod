@@ -46,16 +46,15 @@ var cmdUpdate = &cobra.Command{
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if remod.Enabled() {
-			if err := remod.Off(); err != nil {
-				return fmt.Errorf("unable to set remod to off: %s", err)
-			}
-			defer func() {
-				if err := remod.On(); err != nil {
-					panic(err)
-				}
-			}()
+		if err := remod.Off(); err != nil {
+			return fmt.Errorf("unable to set remod to off: %s", err)
 		}
+
+		defer func() {
+			if err := remod.On(); err != nil {
+				panic(err)
+			}
+		}()
 
 		included := args
 		recursive := viper.GetBool("recursive")
