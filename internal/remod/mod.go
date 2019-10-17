@@ -37,7 +37,7 @@ func Enabled() bool {
 func Install(prefix string, version string, included []string, excluded []string) error {
 
 	if Enabled() {
-		return fmt.Errorf("remod is already on")
+		return nil
 	}
 
 	if !strings.HasPrefix(prefix, ".") && version == "" {
@@ -76,10 +76,6 @@ func Install(prefix string, version string, included []string, excluded []string
 // On enables remod
 func On() error {
 
-	if Enabled() {
-		return nil
-	}
-
 	// we read the current state
 	gomod, err := ioutil.ReadFile("go.mod")
 	if err != nil {
@@ -102,8 +98,6 @@ func On() error {
 		return fmt.Errorf("unable to strip original gomod: %s", err)
 	}
 
-	godev = prepareGoDev(godev)
-
 	mbak := goModBackup()
 	sback := goSumBackup()
 
@@ -119,7 +113,7 @@ func On() error {
 		return fmt.Errorf("unable to write %s: %s", sback, err)
 	}
 
-	if err := ioutil.WriteFile("go.mod", assemble(gomod, godev), 0644); err != nil {
+	if err := ioutil.WriteFile("go.mod", assemble(gomod, prepareGoDev(godev)), 0644); err != nil {
 		return fmt.Errorf("unable to write go.mod: %s", err)
 	}
 

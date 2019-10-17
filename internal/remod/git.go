@@ -59,34 +59,40 @@ func GitFilterClean(filename string, input io.Reader, output io.Writer) error {
 	}
 
 	if !Enabled() {
-		_, err = output.Write(idata)
-		return err
+		must(output.Write(idata))
+		return nil
 	}
 
 	switch filename {
 
 	case "go.mod":
 
-		gomod, err := ioutil.ReadFile(goModBackup())
+		mbak := goModBackup()
+		gomod, err := ioutil.ReadFile(mbak)
 		if err != nil {
-			return fmt.Errorf("unable to update previous bak: %s", err)
+			return fmt.Errorf("unable to read %s: %s", mbak, err)
 		}
 
-		_, err = output.Write(gomod)
-		return err
+		must(output.Write(gomod))
+
+		return nil
 
 	case "go.sum":
 
-		gosum, err := ioutil.ReadFile(goSumBackup())
+		sbak := goSumBackup()
+		gosum, err := ioutil.ReadFile(sbak)
 		if err != nil {
-			return fmt.Errorf("unable to update previous bak: %s", err)
+			return fmt.Errorf("unable to read %s: %s", sbak, err)
 		}
 
-		_, err = output.Write(gosum)
-		return err
-	}
+		must(output.Write(gosum))
 
-	return nil
+		return nil
+
+	default:
+
+		panic(fmt.Errorf("received non go.mod and non go.sum: %s", filename))
+	}
 }
 
 // GitFilterSmudge is used by git filter.
@@ -98,8 +104,8 @@ func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
 	}
 
 	if !Enabled() {
-		_, err = output.Write(idata)
-		return err
+		must(output.Write(idata))
+		return nil
 	}
 
 	switch filename {
@@ -111,16 +117,19 @@ func GitFilterSmudge(filename string, input io.Reader, output io.Writer) error {
 			return fmt.Errorf("unable to read %s: %s", goDev, err)
 		}
 
-		_, err = output.Write(append(idata, append([]byte("\n"), godev...)...))
-		return err
+		must(output.Write(assemble(idata, prepareGoDev(godev))))
+
+		return nil
 
 	case "go.sum":
 
-		_, err = output.Write(idata)
-		return err
+		must(output.Write(idata))
+
+		return nil
 
 	default:
-		return fmt.Errorf("received non go.mod and non go.sum: %s", filename)
+
+		panic(fmt.Errorf("received non go.mod and non go.sum: %s", filename))
 	}
 }
 
