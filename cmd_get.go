@@ -22,15 +22,26 @@ import (
 )
 
 var cmdGet = &cobra.Command{
-	Use:                "get",
-	Aliases:            []string{"g"},
-	Short:              "Run a wrapper go get command",
+	Use:     "get",
+	Aliases: []string{"g"},
+	Short:   "Run a wrapper go get command",
+	Long: `This wraps a single go get command while remod is on.
+
+This can be used to add a new dependency. Every argument is passed
+to the underlying go get command.
+`,
 	DisableFlagParsing: true,
+	Example: `remod get go.aporeto.io/gaia@latest
+`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		if len(args) == 1 && (args[0] == "-h" || args[0] == "--help") {
+			return cmd.Usage()
+		}
 
 		if len(args) == 0 {
 			return fmt.Errorf("you must at least pass one argument")

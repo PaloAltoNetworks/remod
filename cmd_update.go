@@ -33,7 +33,23 @@ func init() {
 var cmdUpdate = &cobra.Command{
 	Use:     "update",
 	Aliases: []string{"up"},
-	Short:   "Update the modules in the given path",
+	Short:   "Update the module in bulk",
+	Long: `This command allows to update multiple modules to a new version at once
+
+It will update all the modules prefixed by the given arguments, excluding the ones
+passed through the '--exclude' flag to the given '--version'.
+
+For instance:
+
+    remod update go.aporeto.io --version master --exclude go.aporeto.io/trireme-lib
+
+This will update all modules starting with 'go.aporeto.io' but 'trireme-lib' to the latest
+master version.
+
+It is also possible to pass a list of folder with the flag '--folder' to perform this update
+on a list of repository. if the '--recursive' flag is set in addition to '--folder' remod
+will check all 1 level subfolders and do the update in these repositories.
+`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},

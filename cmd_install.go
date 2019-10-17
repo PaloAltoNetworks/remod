@@ -25,9 +25,28 @@ func init() {
 }
 
 var cmdInstall = &cobra.Command{
-	Use:     "install",
-	Aliases: []string{"i"},
-	Short:   "Prepare the repository for remod",
+	Use:     "init",
+	Aliases: []string{"i", "install"},
+	Short:   "Initializes the repository for remod",
+	Long: `This command prepares and align your repository to work with remod.
+
+It will:
+- Prepare the '.gitattribute' file if needed
+- Prepare the '.gitignore' file if needed
+- Prepare the '.git/config' filter if needed
+
+It will also create the 'remod.dev' file if needed with the eventual replacements
+provided through the '--include' and '--exclude' flags. If no replacements are provided,
+the remod.dev file will be empty. You can then add your replacements manually.
+
+The flag '--replace-version' allows to pass a version to use for replacement.
+The flag '--prefix' allows to set the replacement prefix. If the replacement prefix
+if local (starts with '.') the '--replace-version' cannot be set. If it is remote,
+'--replace-version' must be set.
+
+Once the repository is initialized or a change has been made to the 'remod.dev' file
+you need to run 'remod on'.
+`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},

@@ -29,7 +29,7 @@ If you never used remod on that repo, you need to
 first run:
 
 ```shell
-remod install
+remod init
 ```
 
 This will add a the necessary `.gitattributes`, and configure your
@@ -42,7 +42,7 @@ The modules you pass are actually used as prefix, so you can replace all the pac
 by doing:
 
 ```shell
-remod on -m github.com/spf13
+remod init -m github.com/spf13
 ```
 
 Which will modify the `remod.dev` file like so:
@@ -60,7 +60,7 @@ To set a different base path, you can use the option
 For instance:
 
 ```shell
-remod on -m github.com/spf13/viper --prefix github.com/me/ --replace-version dev
+remod init -m github.com/spf13/viper --prefix github.com/me/ --replace-version dev
 ```
 
 Which will turn the `remod.dev` file to:

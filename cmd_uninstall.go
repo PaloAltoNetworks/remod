@@ -21,6 +21,11 @@ var cmdUninstall = &cobra.Command{
 	Use:     "uninstall",
 	Aliases: []string{"u"},
 	Short:   "Remove developpment replace directive",
+	Long: `This command will remove the 'remod.dev' and '.remod' repo
+
+It will also remove the filters from your '.git/config'. However
+the '.gitattributes' and '.gitignore' file remain untouched.
+`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},

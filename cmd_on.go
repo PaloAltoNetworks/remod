@@ -19,7 +19,18 @@ import (
 
 var cmdOn = &cobra.Command{
 	Use:   "on",
-	Short: "Apply developpment replace directive",
+	Short: "Activate remod on the current branch",
+	Long: `This command will turn on the development mode for the current branch.
+
+It will create a backup of your current 'go.mod' file (stripped from any
+eventual development replacement remains), and will apply the replacements
+from your 'remod.dev' file.
+
+It will also align the git filters from '.git/config' if they are missing.
+
+Note that everytime you switch to a new branch, or pull a change, you must
+run 'remod on' to realign remod with the latest changes.
+`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},

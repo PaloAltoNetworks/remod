@@ -19,7 +19,13 @@ import (
 
 var cmdOff = &cobra.Command{
 	Use:   "off",
-	Short: "Remove developpment replace directive",
+	Short: "Activate remod on the current branch",
+	Long: `This command will turn on the development mode for the current branch.
+
+It will restore the original 'go.mod' file and will remove the development replacements.
+
+This will restore the branch upstream behavior with go modules.
+`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
