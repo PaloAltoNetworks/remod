@@ -41,6 +41,7 @@ func main() {
 		cmdOff,
 		cmdUpdate,
 		cmdGet,
+		cmdTidy,
 
 		cmdGitClean,
 		cmdGitSmudge,
