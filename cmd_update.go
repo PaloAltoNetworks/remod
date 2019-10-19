@@ -62,15 +62,17 @@ will check all 1 level subfolders and do the update in these repositories.
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if err := remod.Off(); err != nil {
-			return fmt.Errorf("unable to set remod to off: %s", err)
-		}
-
-		defer func() {
-			if err := remod.On(); err != nil {
-				panic(err)
+		if remod.Initialized() {
+			if err := remod.Off(); err != nil {
+				return fmt.Errorf("unable to set remod to off: %s", err)
 			}
-		}()
+
+			defer func() {
+				if err := remod.On(); err != nil {
+					panic(err)
+				}
+			}()
+		}
 
 		included := args
 		recursive := viper.GetBool("recursive")

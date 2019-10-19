@@ -47,15 +47,17 @@ to the underlying go get command.
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if err := remod.Off(); err != nil {
-			return fmt.Errorf("unable to set remod to off: %s", err)
-		}
-
-		defer func() {
-			if err := remod.On(); err != nil {
-				panic(err)
+		if remod.Initialized() {
+			if err := remod.Off(); err != nil {
+				return fmt.Errorf("unable to set remod to off: %s", err)
 			}
-		}()
+
+			defer func() {
+				if err := remod.On(); err != nil {
+					panic(err)
+				}
+			}()
+		}
 
 		c := exec.Command("go", append([]string{"get"}, args...)...)
 		c.Stdin = os.Stdin

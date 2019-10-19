@@ -33,6 +33,21 @@ func Enabled() bool {
 	return false
 }
 
+// Initialized checks if remod is initialized.
+func Initialized() bool {
+
+	_, err := os.Stat("remod.dev")
+	if err == nil {
+		return true
+	}
+
+	if !os.IsNotExist(err) {
+		panic(err)
+	}
+
+	return false
+}
+
 // Install installs go mod in the current repo.
 func Install(prefix string, version string, included []string, excluded []string) error {
 
