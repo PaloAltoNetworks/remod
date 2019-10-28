@@ -14,42 +14,34 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.aporeto.io/remod/internal/remod"
 )
 
-func main() {
+var cmdStatus = &cobra.Command{
+	Use:     "status",
+	Aliases: []string{"stat", "st"},
+	Short:   "Tells if remod is currently active on the branch",
+	Long: `This command will print in stdout if remod is currently
+on for the current branch.
 
-	cobra.OnInitialize(func() {
-		viper.SetEnvPrefix("remod")
-		viper.AutomaticEnv()
-		viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	})
+It will return 0 if on, 1 otherwise.
+`,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return viper.BindPFlags(cmd.Flags())
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
 
-	var rootCmd = &cobra.Command{
-		Use:           "remod",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
+		if remod.Enabled() {
+			fmt.Println("remod is on")
+			os.Exit(0)
+		} else {
+			fmt.Println("remod is off")
+			os.Exit(1)
+		}
 
-	rootCmd.AddCommand(
-		cmdInstall,
-		cmdUninstall,
-		cmdOn,
-		cmdOff,
-		cmdUpdate,
-		cmdGet,
-		cmdTidy,
-		cmdStatus,
-
-		cmdGitClean,
-		cmdGitSmudge,
-	)
-
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		os.Exit(1)
-	}
+		return nil
+	},
 }
