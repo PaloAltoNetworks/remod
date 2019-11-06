@@ -42,15 +42,17 @@ to the underlying go mod tidy command.
 			return cmd.Usage()
 		}
 
-		if err := remod.Off(); err != nil {
-			return fmt.Errorf("unable to set remod to off: %s", err)
-		}
-
-		defer func() {
-			if err := remod.On(); err != nil {
-				panic(err)
+		if remod.Enabled() {
+			if err := remod.Off(); err != nil {
+				return fmt.Errorf("unable to set remod to off: %s", err)
 			}
-		}()
+
+			defer func() {
+				if err := remod.On(); err != nil {
+					panic(err)
+				}
+			}()
+		}
 
 		c := exec.Command("go", append([]string{"mod", "tidy"}, args...)...)
 		c.Stdin = os.Stdin

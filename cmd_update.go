@@ -62,7 +62,7 @@ will check all 1 level subfolders and do the update in these repositories.
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if remod.Initialized() {
+		if remod.Enabled() {
 			if err := remod.Off(); err != nil {
 				return fmt.Errorf("unable to set remod to off: %s", err)
 			}

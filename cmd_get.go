@@ -47,7 +47,7 @@ to the underlying go get command.
 			return fmt.Errorf("you must at least pass one argument")
 		}
 
-		if remod.Initialized() {
+		if remod.Enabled() {
 			if err := remod.Off(); err != nil {
 				return fmt.Errorf("unable to set remod to off: %s", err)
 			}
