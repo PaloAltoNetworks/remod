@@ -102,7 +102,7 @@ func GitFilterClean(input io.Reader, output io.Writer) error {
 	}
 
 	if !Enabled() {
-		must(output.Write(idata))
+		must(output.Write(strip(idata)))
 		return nil
 	}
 
