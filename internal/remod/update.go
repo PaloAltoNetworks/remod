@@ -28,7 +28,7 @@ func Update(modules []string, version string) error {
 
 		mod = fmt.Sprintf("%s@%s", mod, version)
 
-		cmd := exec.Command("go", "get", mod)
+		cmd := exec.Command("go", "get", "-d", mod)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 

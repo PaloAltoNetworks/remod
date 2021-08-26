@@ -59,7 +59,7 @@ to the underlying go get command.
 			}()
 		}
 
-		c := exec.Command("go", append([]string{"get"}, args...)...)
+		c := exec.Command("go", append([]string{"get", "-d"}, args...)...)
 		c.Stdin = os.Stdin
 		c.Stderr = os.Stderr
 		c.Stdout = os.Stdout
