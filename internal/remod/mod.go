@@ -13,7 +13,6 @@ package remod
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -63,7 +62,7 @@ func Install(prefix string, version string, included []string, excluded []string
 		return fmt.Errorf("you must not set --replace-version if --prefix is local")
 	}
 
-	gomod, err := ioutil.ReadFile("go.mod")
+	gomod, err := os.ReadFile("go.mod")
 	if err != nil {
 		return fmt.Errorf("unable to read go.mod: %s", err)
 	}
@@ -78,7 +77,7 @@ func Install(prefix string, version string, included []string, excluded []string
 		return nil
 	}
 
-	if err := ioutil.WriteFile(goDev, odata, 0655); err != nil {
+	if err := os.WriteFile(goDev, odata, 0655); err != nil {
 		return err
 	}
 
@@ -89,17 +88,17 @@ func Install(prefix string, version string, included []string, excluded []string
 func On() error {
 
 	// we read the current state
-	gomod, err := ioutil.ReadFile("go.mod")
+	gomod, err := os.ReadFile("go.mod")
 	if err != nil {
 		return fmt.Errorf("unable to read go.mod: %s", err)
 	}
 
-	gosum, err := ioutil.ReadFile("go.sum")
+	gosum, err := os.ReadFile("go.sum")
 	if err != nil {
 		return fmt.Errorf("unable to read go.sum: %s", err)
 	}
 
-	godev, err := ioutil.ReadFile(goDev)
+	godev, err := os.ReadFile(goDev)
 	if err != nil {
 		return fmt.Errorf("unable to read %s: %s", goDev, err)
 	}
@@ -114,19 +113,19 @@ func On() error {
 		return fmt.Errorf("unable to create remod directory: %s", err)
 	}
 
-	if err := ioutil.WriteFile(mbak, gomod, 0644); err != nil {
+	if err := os.WriteFile(mbak, gomod, 0644); err != nil {
 		return fmt.Errorf("unable to write %s: %s", mbak, err)
 	}
 
-	if err := ioutil.WriteFile(sback, gosum, 0644); err != nil {
+	if err := os.WriteFile(sback, gosum, 0644); err != nil {
 		return fmt.Errorf("unable to write %s: %s", sback, err)
 	}
 
-	if err := ioutil.WriteFile("go.mod", assemble(gomod, prepareGoDev(godev)), 0644); err != nil {
+	if err := os.WriteFile("go.mod", assemble(gomod, prepareGoDev(godev)), 0644); err != nil {
 		return fmt.Errorf("unable to write go.mod: %s", err)
 	}
 
-	if err := ioutil.WriteFile("go.sum", gosum, 0644); err != nil {
+	if err := os.WriteFile("go.sum", gosum, 0644); err != nil {
 		return fmt.Errorf("unable to write go.sum: %s", err)
 	}
 
@@ -143,12 +142,12 @@ func Off() error {
 	mbak := goModBackup()
 	sback := goSumBackup()
 
-	gomod, err := ioutil.ReadFile(mbak)
+	gomod, err := os.ReadFile(mbak)
 	if err != nil {
 		return fmt.Errorf("unable to read go.mod: %s", err)
 	}
 
-	gosum, err := ioutil.ReadFile(sback)
+	gosum, err := os.ReadFile(sback)
 	if err != nil {
 		return fmt.Errorf("unable to read go.sum: %s", err)
 	}
@@ -161,11 +160,11 @@ func Off() error {
 		return fmt.Errorf("unable to remove %s: %s", sback, err)
 	}
 
-	if err := ioutil.WriteFile("go.mod", gomod, 0644); err != nil {
+	if err := os.WriteFile("go.mod", gomod, 0644); err != nil {
 		return fmt.Errorf("unable to write %s: %s", mbak, err)
 	}
 
-	if err := ioutil.WriteFile("go.sum", gosum, 0644); err != nil {
+	if err := os.WriteFile("go.sum", gosum, 0644); err != nil {
 		return fmt.Errorf("unable to write %s: %s", sback, err)
 	}
 
