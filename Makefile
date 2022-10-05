@@ -8,7 +8,8 @@ default: lint test
 lint:
 	golangci-lint run \
 		--disable-all \
-		--exclude-use-default=true \
+		--exclude-use-default=false \
+		--exclude=package-comments \
 		--enable=errcheck \
 		--enable=goimports \
 		--enable=ineffassign \
