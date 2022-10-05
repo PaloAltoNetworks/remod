@@ -77,11 +77,7 @@ func Install(prefix string, version string, included []string, excluded []string
 		return nil
 	}
 
-	if err := os.WriteFile(goDev, odata, 0655); err != nil {
-		return err
-	}
-
-	return nil
+	return os.WriteFile(goDev, odata, 0655)
 }
 
 // On enables remod
