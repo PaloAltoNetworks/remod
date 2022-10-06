@@ -13,7 +13,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -85,7 +84,7 @@ will check all 1 level subfolders and do the update in these repositories.
 
 			if recursive && folder != "." {
 
-				items, err := ioutil.ReadDir(folder)
+				items, err := os.ReadDir(folder)
 				if err != nil {
 					return fmt.Errorf("unable to list content of dir: %s", err)
 				}
@@ -121,7 +120,7 @@ will check all 1 level subfolders and do the update in these repositories.
 					fmt.Println("* Entering", basedir)
 				}
 
-				idata, err := ioutil.ReadFile(p)
+				idata, err := os.ReadFile(p)
 				if err != nil {
 					return fmt.Errorf("unable to read go.mod: %s", err)
 				}
