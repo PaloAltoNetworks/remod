@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -56,7 +55,7 @@ func GitAdd() error {
 // GitInit initializes the .gitattribute file.
 func GitInit() error {
 
-	idata, err := ioutil.ReadFile(".gitattributes")
+	idata, err := os.ReadFile(".gitattributes")
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
@@ -69,11 +68,11 @@ func GitInit() error {
 		idata = append(idata, []byte("go.sum filter=remod\n")...)
 	}
 
-	if err := ioutil.WriteFile(".gitattributes", idata, 0644); err != nil {
+	if err := os.WriteFile(".gitattributes", idata, 0644); err != nil {
 		return fmt.Errorf("unable to write .gitattributes: %s", err)
 	}
 
-	idata, err = ioutil.ReadFile(".gitignore")
+	idata, err = os.ReadFile(".gitignore")
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
@@ -86,7 +85,7 @@ func GitInit() error {
 		idata = append(idata, []byte(".remod\n")...)
 	}
 
-	if err := ioutil.WriteFile(".gitignore", idata, 0644); err != nil {
+	if err := os.WriteFile(".gitignore", idata, 0644); err != nil {
 		return fmt.Errorf("unable to write .gitignore: %s", err)
 	}
 
@@ -96,7 +95,7 @@ func GitInit() error {
 // GitFilterClean is used by git filter.
 func GitFilterClean(input io.Reader, output io.Writer) error {
 
-	idata, err := ioutil.ReadAll(input)
+	idata, err := io.ReadAll(input)
 	if err != nil {
 		return fmt.Errorf("unable to read input: %s", err)
 	}
@@ -109,7 +108,7 @@ func GitFilterClean(input io.Reader, output io.Writer) error {
 	if bytes.Contains(idata, []byte("module ")) {
 
 		mbak := goModBackup()
-		gomod, err := ioutil.ReadFile(mbak)
+		gomod, err := os.ReadFile(mbak)
 		if err != nil {
 			return fmt.Errorf("unable to read %s: %s", mbak, err)
 		}
@@ -121,7 +120,7 @@ func GitFilterClean(input io.Reader, output io.Writer) error {
 	} else if bytes.Contains(idata, []byte(" h1:")) {
 
 		sbak := goSumBackup()
-		gosum, err := ioutil.ReadFile(sbak)
+		gosum, err := os.ReadFile(sbak)
 		if err != nil {
 			return fmt.Errorf("unable to read %s: %s", sbak, err)
 		}
@@ -138,7 +137,7 @@ func GitFilterClean(input io.Reader, output io.Writer) error {
 // GitFilterSmudge is used by git filter.
 func GitFilterSmudge(input io.Reader, output io.Writer) error {
 
-	idata, err := ioutil.ReadAll(input)
+	idata, err := io.ReadAll(input)
 	if err != nil {
 		return fmt.Errorf("unable to read input: %s", err)
 	}
@@ -150,7 +149,7 @@ func GitFilterSmudge(input io.Reader, output io.Writer) error {
 
 	if bytes.Contains(idata, []byte("module ")) {
 
-		godev, err := ioutil.ReadFile(goDev)
+		godev, err := os.ReadFile(goDev)
 
 		if err != nil {
 			return fmt.Errorf("unable to read %s: %s", goDev, err)
