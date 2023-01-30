@@ -1,5 +1,10 @@
 # remod
 
+> DEPRECATED: Go devs, after dismissing the use case remod was solving, finally
+> implemented a native way to do what remod was doing with
+> [go workspaces](https://go.dev/blog/get-familiar-with-workspaces).
+> So this repository is now deprecated and won't get any new updates.
+
 remod is a tool to work with local copies of libraries and go modules.
 It provides a cli to manage replacement directives in a file called `remod.dev`
 that can be ignored from VSC. Remod also uses git attributes to make the changes
