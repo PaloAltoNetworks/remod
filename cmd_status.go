@@ -37,10 +37,10 @@ It will return 0 if on, 1 otherwise.
 		if remod.Enabled() {
 			fmt.Println("remod is on")
 			os.Exit(0)
-		} else {
-			fmt.Println("remod is off")
-			os.Exit(1)
 		}
+
+		fmt.Println("remod is off")
+		os.Exit(1)
 
 		return nil
 	},

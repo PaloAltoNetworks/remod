@@ -32,7 +32,7 @@ func makeGoModDev(modules []string, base string, version string) []byte {
 	return append(bytes.TrimSpace(buf.Bytes()), '\n')
 }
 
-func must(n int, err error) {
+func must(_ int, err error) {
 	if err != nil {
 		panic(err)
 	}
